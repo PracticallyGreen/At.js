@@ -30,7 +30,8 @@ gulp test
 
 ## Wespire specific edits
 
-
+**1) Force query to remote server on every keypress**  
+https://github.com/PracticallyGreen/At.js/issues/1
 
 
 
