@@ -22,9 +22,8 @@ class Model
     searchKey = @context.getOpt("searchKey")
     data = @context.callbacks('filter').call(@context, query, data, searchKey) || []
     _remoteFilter = @context.callbacks('remoteFilter')
-    if data.length > 0 or (!_remoteFilter and data.length == 0)
-      callback data
-    else
+    callback data
+    if _remoteFilter
       _remoteFilter.call(@context, query, callback)
 
   # get or set current data which would be shown on the list view.
