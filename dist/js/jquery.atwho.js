@@ -822,30 +822,25 @@ EditableController = (function(superClass) {
   };
 
   EditableController.prototype.insert = function(content, $li) {
-    var data, overrides, range, suffix, suffixNode;
+    var data, range, suffix, suffixNode;
     if (!this.$inputor.is(':focus')) {
       this.$inputor.focus();
     }
-    overrides = this.getOpt("functionOverrides");
-    if (overrides.insert) {
-      return overrides.insert.bind(this)(content, $li);
-    } else {
-      suffix = (suffix = this.getOpt('suffix')) === "" ? suffix : suffix || "\u00A0";
-      data = $li.data('item-data');
-      this.query.el.removeClass('atwho-query').addClass('atwho-inserted').html(content).attr('data-atwho-at-query', "" + data['atwho-at'] + this.query.text).attr('contenteditable', "false");
-      if (range = this._getRange()) {
-        if (this.query.el.length) {
-          range.setEndAfter(this.query.el[0]);
-        }
-        range.collapse(false);
-        range.insertNode(suffixNode = this.app.document.createTextNode("\u200D" + suffix));
-        this._setRange('after', suffixNode, range);
+    suffix = (suffix = this.getOpt('suffix')) === "" ? suffix : suffix || "\u00A0";
+    data = $li.data('item-data');
+    this.query.el.removeClass('atwho-query').addClass('atwho-inserted').html(content).attr('data-atwho-at-query', "" + data['atwho-at'] + this.query.text).attr('contenteditable', "false");
+    if (range = this._getRange()) {
+      if (this.query.el.length) {
+        range.setEndAfter(this.query.el[0]);
       }
-      if (!this.$inputor.is(':focus')) {
-        this.$inputor.focus();
-      }
-      return this.$inputor.change();
+      range.collapse(false);
+      range.insertNode(suffixNode = this.app.document.createTextNode("" + suffix));
+      this._setRange('after', suffixNode, range);
     }
+    if (!this.$inputor.is(':focus')) {
+      this.$inputor.focus();
+    }
+    return this.$inputor.change();
   };
 
   return EditableController;
@@ -875,9 +870,8 @@ Model = (function() {
     searchKey = this.context.getOpt("searchKey");
     data = this.context.callbacks('filter').call(this.context, query, data, searchKey) || [];
     _remoteFilter = this.context.callbacks('remoteFilter');
-    if (data.length > 0 || (!_remoteFilter && data.length === 0)) {
-      return callback(data);
-    } else {
+    callback(data);
+    if (_remoteFilter) {
       return _remoteFilter.call(this.context, query, callback);
     }
   };
@@ -1188,7 +1182,6 @@ $.fn.atwho["default"] = {
   insertTpl: "${atwho-at}${name}",
   headerTpl: null,
   callbacks: DEFAULT_CALLBACKS,
-  functionOverrides: {},
   searchKey: "name",
   suffix: void 0,
   hideWithoutSuffix: false,
